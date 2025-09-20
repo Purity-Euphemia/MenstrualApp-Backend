@@ -21,4 +21,17 @@ exports.login = async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(400).json({ message: "User already exists" });
     }
-}
+    res.json({ token: generateToken(user._id), user: user });
+};
+
+exports.getSettings = async (req, res) => {
+    const user = await User.findById(req.user);
+    res.json(user.cycleSettings);
+};
+
+exports.saveSettings = async (req, res) => {
+    const user = await User.findById(req.user);
+    user.cycleSettings = req.body;
+    await user.save();
+    res.json({ message: "Settings updated", cycleSettings: user.cycleSettings });
+};
